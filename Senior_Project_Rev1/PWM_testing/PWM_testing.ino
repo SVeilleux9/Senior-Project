@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+int PIDcalc(int poss);
+
 void setup() {
   DDRB |= (1 << DDB5);
   DDRD &= (0 << DDD2) & (0 << DDD3);
@@ -38,58 +40,58 @@ void setup() {
 int poss=0;
 ISR(INT0_vect){ 
   (PIND & (1 << DDD2))/4 == (PIND & (1 << DDD3))/8 ?  poss++ : poss--;
-  Serial.println(poss);
 }
 
 ISR(INT1_vect){
   (PIND & (1 << DDD2))/4 == (PIND & (1 << DDD3))/8 ?  poss-- : poss++;
-  Serial.println(poss);
 }
 
-
 ISR(TIMER1_COMPA_vect){
-
-  double kp = 1, ki = 0.01, kd = .25;
-  double ITerm;
-  int lastPoss;
-  double outMax = 200;
-  double outMin = -200;
-  double output;
-
-  
-/*Compute all the working error variables*/
-  int error = ADC - poss;
-  if(abs(error) >2){
-    ITerm+= (ki * error);
-    if(ITerm > outMax) ITerm= outMax;
-    else if(ITerm < outMin) ITerm= outMin;
-    double dInput = (poss - lastPoss);
-    Serial.println(error);
-  
-    /*Compute PID Output*/
-    output = kp * error + ITerm- kd * dInput;
-    
-    if(output > outMax) output = outMax;
-      else if(output < outMin) output = outMin;
-  
-    /*Remember some variables for next time*/
-    lastPoss = poss;
-  } 
-  
-  Serial.println(output);
-  if(output > 50){
-    OCR0A = output;
-    OCR0B = 0;
-  }
-  else if(output < -50){
-    OCR0A = 0;
-    OCR0B = output;
-  }
-  else{
-    OCR0A = 0;
-    OCR0B = 0;
-  }
+  int output = PIDcalc(poss);
+  OCR0A = 126 + output;
 }
 
 void loop() {
 }
+
+
+#define kp 1
+#define ki 0.01
+#define kd 0.25
+#define outMax  20          //The PWM output should have a max of 146
+#define outMin -20          //The PWM output should have a min of 106
+
+int PIDcalc(int poss){  
+  int lastPoss, change, error;
+  double P,I,D;
+  double output;
+
+  // Calculate P, I, and D
+  error = ADC - poss;
+
+  Serial.println(ADC);
+  //P
+  P = (kp * error);
+
+  //This should not be needed but to ensure that the Iterm does not get too large it is limited
+  I += (ki * error);
+  if(I > outMax) I = outMax;
+  else if(I < outMin) I = outMin;
+
+  //D
+  change = (poss - lastPoss);
+  D = (kd * change);
+  
+  //Add them together
+  output = P + I - D;
+
+  //Check once again that the max is not greater than abs(20)
+  if(output > outMax) output = outMax;
+    else if(output < outMin) output = outMin;
+    
+  lastPoss = poss; 
+
+  return (int) output;
+}
+
+

@@ -69,7 +69,7 @@ int PIDcalc(int poss){
   // Calculate P, I, and D
   error = ADC - poss;
 
-  Serial.println(ADC);
+  Serial.println(poss);
   //P
   P = (kp * error);
 

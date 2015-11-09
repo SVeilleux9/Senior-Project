@@ -2,16 +2,26 @@
 #include "MYPID.h"
 
 
-#define kp 1
-#define ki 0.01
-#define kd 0.01
-#define maxOutput  20                        //The PWM output should have a max of 146
-#define minOutput -20                        //The PWM output should have a min of 106
+myPID::myPID(){
+	
+}
 
-int PIDcalc(int poss){  
-  int lastPoss, change, error;
-  double P,I,D;
-  int output;
+myPID::~myPID(){
+	
+}
+
+void myPID::setValues(int max, int min, double p, double i, double d){
+	maxOutput = max;
+	minOutput = min;
+	kp = p;
+	ki = i;
+	kd = d;
+
+}
+
+int myPID::PIDcalc(int poss){  
+	int lastPoss, change, error, output; 
+	double P, I, D;
 
   // Calculate P, I, and D
   error = ADC - poss;
@@ -37,12 +47,5 @@ int PIDcalc(int poss){
     else if(output < minOutput) output = minOutput;
 
   return output;
-
-  //The following was used for debugging. Commented out to improve performance times. 
-  /*Serial.print(poss);
-  Serial.print("  ");
-  Serial.print(ADC);
-  Serial.print("  ");
-  Serial.println(error); */
   
 }

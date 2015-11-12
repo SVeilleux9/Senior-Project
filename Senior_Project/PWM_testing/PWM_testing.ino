@@ -3,18 +3,22 @@
 #include "MYPID.h"
 #include "inits.h"
 
-#define maxOutput -20
-#define minOutput  20
+#define maxOutput  20
+#define minOutput -20
 #define kp         1
-#define ki        .01
-#define kd        .01
+#define kii        0
+#define kd         0
 
 int poss=0;
 myPID PIDinstance;
 
 void setup() {
+  pinMode(8,OUTPUT);
   inits();
-  PIDinstance.setValues(maxOutput, minOutput, kp, ki, kd);
+  PIDinstance.setValues(maxOutput, minOutput, kp, kii, kd);
+  Serial.begin(250000);
+  delay(100);
+  digitalWrite(8,LOW);
 }
 
 void loop() {
@@ -29,13 +33,15 @@ ISR(INT1_vect){
 }
 
 ISR(TIMER1_COMPA_vect){
-  int output = PIDinstance.PIDcalc(poss);
+  int error = ADC - poss;
+  int output = PIDinstance.PIDcalc(error, poss);
   OCR0A = 126 + output;
   OCR0B = 126 + output;
+
+  Serial.print(PIDinstance.P);
+  Serial.print("  ");
+  Serial.println(output);
 }
-
-
-
 
 
 

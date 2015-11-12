@@ -2,13 +2,17 @@
 #define MYPID_H
 
 class myPID{
+	
+
+public:
 	int maxOutput, minOutput;
 	double kp, ki, kd;
-public:
+	double P=0,I=0,D=0;
+
 	myPID();
 	~myPID();
 	void setValues(int maxOutput, int minOutput, double kp, double ki, double kd);
-	int PIDcalc(int poss);
+	int PIDcalc(int error, int poss);
 
 };
 

@@ -1,25 +1,27 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/delay.h>
 #include "MYPID.h"
 #include "inits.h"
 
+#define F_CPU 16000000UL // 16 MHz
 #define maxOutput  20
 #define minOutput -20
-#define kp         1
-#define kii        0
-#define kd         0
+#define kp         .1
+#define kii        0.3
+#define kd         0.1
 
 int poss=0;
+int myDelay = 0;
 myPID PIDinstance;
 
 void setup() {
-  pinMode(8,OUTPUT);
-  inits();
   PIDinstance.setValues(maxOutput, minOutput, kp, kii, kd);
+  inits();  
+  zeroMotor();
   Serial.begin(250000);
-  delay(100);
-  digitalWrite(8,LOW);
 }
+
 
 void loop() {
 }
@@ -33,15 +35,38 @@ ISR(INT1_vect){
 }
 
 ISR(TIMER1_COMPA_vect){
-  int error = ADC - poss;
-  int output = PIDinstance.PIDcalc(error, poss);
-  OCR0A = 126 + output;
-  OCR0B = 126 + output;
-
-  Serial.print(PIDinstance.P);
-  Serial.print("  ");
-  Serial.println(output);
+  Serial.println(ADC);
+  int output = PIDinstance.PIDcalc(poss) * 2;
+  setMotorSpeed(output);
 }
 
 
+void zeroMotor(){
+  TIMSK1 &= (0 << OCIE1A);
+  bool moving = true;
+  int lastPoss;
+
+  setMotorSpeed(10);
+  _delay_ms(1000);
+  setMotorSpeed(-7);
+  
+  while(moving == true){
+    if(poss == lastPoss){
+      moving = false;
+      setMotorSpeed(10);
+      _delay_ms(70);
+      setMotorSpeed(0);
+    }
+    else lastPoss = poss;
+    _delay_ms(20);
+  }
+  poss = 0;
+  TIMSK1 |= (1 << OCIE1A);
+}
+
+
+void setMotorSpeed(int speed){
+    OCR0A = 126+speed;
+    OCR0B = 126+speed;
+}
 

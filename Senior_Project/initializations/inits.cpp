@@ -5,6 +5,7 @@ void inits(){
 
   DDRD &= (0 << DDD2) & (0 << DDD3);
   DDRD |= (1 << DDD5) | (1 << DDD6);
+  DDRB |= (1 << DDB0);
   
   TCCR0A = 0;
   TCCR0B = 0;
@@ -30,6 +31,9 @@ void inits(){
   ADCSRB |= (0 << ADTS2) | (0 << ADTS1) | (0 << ADTS0);
   ADMUX |= (0b00000111); //Select ADC channel 7
   ADCSRA |= (1 << ADSC);
+
+  delay(100);
+  PORTB |= (1 << DDB0):
 
 }
 

@@ -7,9 +7,9 @@
 #define F_CPU 16000000UL // 16 MHz
 #define maxOutput  20
 #define minOutput -20
-#define kp         .1
-#define kii        0.3
-#define kd         0.1
+#define kp         1
+#define kii        0
+#define kd         0
 
 int poss=0;
 int myDelay = 0;

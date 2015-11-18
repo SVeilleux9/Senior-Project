@@ -16,16 +16,19 @@ void myPID::setValues(int max, int min, double p, double i, double d){
 	kp = p;
 	ki = i;
 	kd = d;
-	P=0;
-	I=0;
-	D=0;
-
 }
 
-int myPID::PIDcalc(int error, int poss){  
-	int lastPoss=0, change=0, output; 
-
+int myPID::PIDcalc(int poss){  
+	int lastPoss=0, change=0, output, error; 
+	double P=0,I=0,D=0;
+	double adjustmentFactor = 1.;
+	
   // Calculate P, I, and D
+  int desired = ADC;
+  if(desired < 94) desired /= 2;
+  else desired -= 46;
+
+	error = (desired * adjustmentFactor) - poss;
 
   //P, proportional term
   P = kp * error;

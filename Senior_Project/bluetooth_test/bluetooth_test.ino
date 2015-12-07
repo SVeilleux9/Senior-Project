@@ -3,7 +3,7 @@ void setup() {
 }
 
 String input;
-int value = 10;
+uint16_t value = 10;
 int timeout;
 bool timeoutBool;
 
@@ -12,25 +12,25 @@ void loop() {
     input = getString();
     
     if(input == "setValue"){
-      Serial.println("Enter Value");
+      Serial.print("Send");
       timeout = millis();
       timeoutBool = false;
       while(Serial.available() == 0 && timeoutBool == false){
         if((timeout + 10000) < millis()){
-          Serial.println("Timed out");
+          Serial.print("Timed out");
           timeoutBool = true;
         }
       }
       input = getString();
       if(aNumber(input)) value = input.toInt();
-      else Serial.println("Entered value is not an int");
+      else Serial.print("Entered value is not an int");
       if(value == 69){
-        Serial.println("You wish");
+        Serial.print("You wish");
       }
     }
 
     if(input == "getValue"){
-      Serial.println(value);
+      Serial.print(value);
     }
   }
 
@@ -44,7 +44,7 @@ bool aNumber(String str){
 }
 
 String getString(){
-  delay(100);
+  delay(10);
   input = "";
   while(Serial.available() > 0){
     input += (char) Serial.read();

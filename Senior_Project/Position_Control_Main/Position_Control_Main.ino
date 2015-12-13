@@ -6,13 +6,14 @@
 #include "MYPID.h"
 #include "inits.h"
 #include "motorControl.h"
+#include "comm.h"
 
 /*** pre-processor constants ***/
  
 #define F_CPU 16000000UL // 16 MHz
 #define maxOutput  20
 #define minOutput -20
-#define kp         1
+#define kp         .5
 #define ki         0
 #define kd         0
 
@@ -20,16 +21,30 @@
 
 myPID PIDinstance;
 myMotor motor;
+comm commInstance;
 
 void setup() {
-  PIDinstance.setValues(maxOutput, minOutput, kp, ki, kd);
+  PIDinstance.setValues(maxOutput, minOutput, kp, ki, kd, true);
   motor.poss = 0;
   inits();  
   motor.zeroMotor();
+  Serial.begin(9600);
 }
 
 
 void loop() {
+
+  if(Serial.available() > 0){
+    commInstance.input = commInstance.getString();
+
+    if(commInstance.input == "setValue") {
+      commInstance.setValue();
+      PIDinstance.setAdjustmentFactor(commInstance.value);
+    }
+    if(commInstance.input == "getValue") Serial.println(PIDinstance.getAdjustmentFactor());
+
+  }
+  
 }
 
 /*
@@ -60,7 +75,7 @@ ISR(INT1_vect){
  *  to accurately calculate the PID constants every 1mS.
  */
 ISR(TIMER1_COMPA_vect){
-  int output = PIDinstance.PIDcalc(motor.poss);
+  int output = PIDinstance.PIDcalc(motor.poss, ADC);
   motor.setMotorSpeed(output);
 }
 

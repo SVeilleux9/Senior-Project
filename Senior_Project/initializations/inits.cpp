@@ -9,7 +9,6 @@ void inits(){
 	DDRD |= (1 << DDD5) | (1 << DDD6);							// PD5 and PD6 = outputs
 	DDRB |= (1 << DDB0);										// PB0		   = output
 	
-	
 	// Set up timer and settings for PWM outputs on PD5 and PD6
 	TCCR0A = 0;
 	TCCR0B = 0;
@@ -22,7 +21,7 @@ void inits(){
 	// Set up the interrupt pins on PD2 and PD3
 	EIMSK |= (1 << INT0) | (1 << INT1);							//Enable external interrupts on PD2 and PD3
 	EICRA |= (1 << ISC10) | (1 << ISC00);						//Set it so that the interrupt occurs every logic change of PD2 and PD3
-
+	
 	// Set up timer settings for the 1mS interrupt used for PID control
 	TCCR1A = 0;
 	TCCR1B = 0;
@@ -42,6 +41,5 @@ void inits(){
 	ADCSRA |= (1 << ADSC);										//Start ADC
 
 	PORTB &= (0 << DDB0);										//Set PB0 low to enable the gate driver
-	
-	
+
 }

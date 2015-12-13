@@ -1,55 +1,36 @@
+#include "comm.h"
+#include "inits.h"
+
 void setup() {
+  inits();
   Serial.begin(9600);
 }
 
-String input;
-uint16_t value = 10;
-int timeout;
-bool timeoutBool;
+
+comm commInstance;
 
 void loop() {
   if(Serial.available() > 0){
-    input = getString();
+    commInstance.input = commInstance.getString();
     
-    if(input == "setValue"){
-      Serial.print("Send");
-      timeout = millis();
-      timeoutBool = false;
-      while(Serial.available() == 0 && timeoutBool == false){
-        if((timeout + 10000) < millis()){
-          Serial.print("Timed out");
-          timeoutBool = true;
-        }
-      }
-      input = getString();
-      if(aNumber(input)) value = input.toInt();
-      else Serial.print("Entered value is not an int");
-      if(value == 69){
-        Serial.print("You wish");
-      }
-    }
-
-    if(input == "getValue"){
-      Serial.print(value);
-    }
+    if(commInstance.input == "setValue") commInstance.setValue();
+    if(commInstance.input == "getValue") Serial.println(commInstance.value);
   }
 
 }
 
-bool aNumber(String str){
-  for(char i=0; i<str.length(); i++){
-    if( !(isDigit(str.charAt(i)))) return false;
-  }
-  return true;
+ISR(INT0_vect){ 
+ 
 }
 
-String getString(){
-  delay(10);
-  input = "";
-  while(Serial.available() > 0){
-    input += (char) Serial.read();
-  }
+ISR(INT1_vect){
 
-  return input;
 }
 
+/*
+ *  ISR(TIMER1_COMPA_vect) is a timer based interrupt that occurs every 1mS. This is used 
+ *  to accurately calculate the PID constants every 1mS.
+ */
+ISR(TIMER1_COMPA_vect){
+
+}

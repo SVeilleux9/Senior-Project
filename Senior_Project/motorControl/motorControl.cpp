@@ -1,16 +1,20 @@
+/*** Included files ***/
+
 #include <avr/io.h>
 #include <avr/delay.h>
 
 #include "motorControl.h"
+
+/*** Pre-processor definitions ***/
+
 #define F_CPU 16000000UL // 16 MHz
 
+/*** Constructor and De-Constructor ***/
 
 myMotor::myMotor(){
-	
 }
 
 myMotor::~myMotor(){
-	
 }
 
 /*  
@@ -23,6 +27,7 @@ myMotor::~myMotor(){
  *  not actually "zero" but slightly below it. To fix this the motor is then spun
  *  clock-wise for a short set time. From this point the motor is set to zero. 
  */
+
 void myMotor::zeroMotor(){
   // Turn off the timer based interrupt 
   TIMSK1 &= (0 << OCIE1A); 
@@ -40,15 +45,11 @@ void myMotor::zeroMotor(){
   while(moving == true){
     if(poss == lastPoss){
       moving = false;
-      setMotorSpeed(10);
-      _delay_ms(70);
-      setMotorSpeed(0);
+      poss = -20;
     }
     else lastPoss = poss;
     _delay_ms(20);
   }
-
-  poss = 0;
   
   // Turn the timer based interrupt back on
   TIMSK1 |= (1 << OCIE1A);
@@ -61,7 +62,8 @@ void myMotor::zeroMotor(){
  * For this reason the outputs can be set to the same value and drive the gate driver
  * which requires two inputs that are inverses of each other. 
  */
+
 void myMotor::setMotorSpeed(int speed){
-    OCR0A = 126+speed; // Sets PWM duty cycle on PD6
-    OCR0B = 126+speed; // Sets PWM duty cycle on PD5
+    OCR0A = 128+speed; // Sets PWM duty cycle on PD6
+    OCR0B = 128+speed; // Sets PWM duty cycle on PD5
 }

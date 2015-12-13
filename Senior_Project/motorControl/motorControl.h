@@ -3,8 +3,9 @@
 
 
 class myMotor{
-	public:
+public:
 	int poss;
+	long spd;
 	
 	myMotor();
 	~myMotor();
